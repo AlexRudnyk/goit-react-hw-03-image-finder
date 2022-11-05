@@ -1,13 +1,12 @@
-import { Formik, Form, ErrorMessage } from 'formik';
+import { Formik, ErrorMessage } from 'formik';
 import * as yup from 'yup';
-import { Input } from './Searchbar.styled';
+import { ImSearch } from 'react-icons/im';
+import PropTypes from 'prop-types';
+import { Input, Header, SearchForm, SearchBtn } from './Searchbar.styled';
 
 const schema = yup.object().shape({
-  searchInput: yup
-    .string()
-    .min(2, 'Too short')
-    .max(50, 'Too long')
-    .required('This field can not be empty'),
+  searchInput: yup.string().min(2, 'Too short').max(50, 'Too long'),
+  // .required('This field can not be empty'),
 });
 
 const initialValues = {
@@ -15,22 +14,22 @@ const initialValues = {
 };
 
 const Searchbar = ({ onSubmit }) => {
-  const handleSubmit = (values, { resetForm }) => {
-    onSubmit(values);
+  const handleSubmit = ({ searchInput }, { resetForm }) => {
+    onSubmit(searchInput);
     resetForm();
   };
 
   return (
-    <Formik
-      initialValues={initialValues}
-      validationSchema={schema}
-      onSubmit={handleSubmit}
-    >
-      <header>
-        <Form>
-          <button type="submit">
-            <span>Search</span>
-          </button>
+    <Header>
+      <Formik
+        initialValues={initialValues}
+        validationSchema={schema}
+        onSubmit={handleSubmit}
+      >
+        <SearchForm>
+          <SearchBtn type="submit">
+            <ImSearch size={20} />
+          </SearchBtn>
 
           <Input
             name="searchInput"
@@ -40,10 +39,14 @@ const Searchbar = ({ onSubmit }) => {
             placeholder="Search images and photos"
           />
           <ErrorMessage name="searchInput" />
-        </Form>
-      </header>
-    </Formik>
+        </SearchForm>
+      </Formik>
+    </Header>
   );
+};
+
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
 };
 
 export default Searchbar;

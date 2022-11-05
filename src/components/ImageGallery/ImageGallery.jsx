@@ -1,11 +1,19 @@
 import ImageGalleryItem from 'components/ImageGalleryItem';
+import PropTypes from 'prop-types';
+import { List } from './ImageGallery.styled';
 
 const ImageGallery = ({ photoArray }) => {
   return (
-    <ul className="gallery">
-      <ImageGalleryItem photoArray={photoArray} />
-    </ul>
+    <div className="gallery">
+      <List>
+        <ImageGalleryItem photoArray={photoArray} />
+      </List>
+    </div>
   );
+};
+
+ImageGallery.propTypes = {
+  photoArray: PropTypes.arrayOf(PropTypes.shape({})),
 };
 
 export default ImageGallery;

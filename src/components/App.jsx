@@ -1,43 +1,97 @@
 import { Component } from 'react';
-// import * as basicLightbox from 'basiclightbox';
+import SimpleLightbox from 'simplelightbox';
+import 'simplelightbox/dist/simple-lightbox.min.css';
 import api from './Api/Api';
 import Searchbar from './Searchbar';
 import ImageGallery from './ImageGallery';
 import Button from './Button';
+import Spinner from './Spinner';
 
 class App extends Component {
   state = {
     searchQuery: '',
     page: 1,
     photoArray: [],
+    status: 'idle',
   };
 
   componentDidUpdate(prevProps, prevState) {
+    this.simpleLightbox();
     const { searchQuery, page } = this.state;
-    if (prevState.searchQuery !== searchQuery || prevState.page !== page) {
-      api.fetchPhoto(searchQuery, page).then(newCards => {
-        this.setState(prevState => ({
-          photoArray: [...prevState.photoArray, ...newCards.hits],
-        }));
+
+    if (prevState.searchQuery !== searchQuery) {
+      this.setState({
+        photoArray: [],
       });
+    }
+    if (prevState.searchQuery !== searchQuery || prevState.page !== page) {
+      this.setState({
+        status: 'pending',
+      });
+      api
+        .fetchPhoto(searchQuery, page)
+        .then(newCards => {
+          this.setState(prevState => ({
+            photoArray: [...prevState.photoArray, ...newCards.hits],
+            status: 'resolved',
+          }));
+        })
+        .catch(error =>
+          this.setState({
+            error,
+            status: 'rejected',
+          })
+        );
     }
   }
 
+  simpleLightbox = () => {
+    var lightbox = new SimpleLightbox('.gallery a', {});
+    lightbox.refresh();
+  };
+
   handleSubmit = inputValue => {
-    console.log('INPUTVALUE: ', inputValue);
     this.setState({
       searchQuery: inputValue,
+      page: 1,
     });
   };
 
+  loadMorePhoto = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+  };
+
   render() {
-    return (
-      <div>
-        <Searchbar onSubmit={this.handleSubmit} />
-        <ImageGallery photoArray={this.state.photoArray} />
-        <Button children={'Load more'} />
-      </div>
-    );
+    const { status, photoArray } = this.state;
+
+    if (status === 'idle') {
+      return <Searchbar onSubmit={this.handleSubmit} />;
+    }
+
+    if (status === 'pending') {
+      return (
+        <>
+          <Searchbar onSubmit={this.handleSubmit} />
+          <Spinner />
+        </>
+      );
+    }
+
+    if (status === 'resolved') {
+      return (
+        <>
+          <Searchbar onSubmit={this.handleSubmit} />
+          <ImageGallery photoArray={photoArray} />
+          <Button onClick={this.loadMorePhoto} />
+        </>
+      );
+    }
+
+    if (status === 'rejected') {
+      return;
+    }
   }
 }
 
