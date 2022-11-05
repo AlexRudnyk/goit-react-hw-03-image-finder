@@ -1,7 +1,11 @@
-const ImageGalleryItem = () => {
-  <li class="gallery-item">
-    <img src="" alt="" />
-  </li>;
+const ImageGalleryItem = ({ photoArray }) => {
+  return photoArray.map(photo => {
+    return (
+      <li key={photo.id}>
+        <img src={photo.previewURL} alt="" />
+      </li>
+    );
+  });
 };
 
 export default ImageGalleryItem;

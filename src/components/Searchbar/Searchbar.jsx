@@ -14,11 +14,12 @@ const initialValues = {
   searchInput: '',
 };
 
-const Searchbar = () => {
+const Searchbar = ({ onSubmit }) => {
   const handleSubmit = (values, { resetForm }) => {
-    console.log(values);
+    onSubmit(values);
     resetForm();
   };
+
   return (
     <Formik
       initialValues={initialValues}
