@@ -4,9 +4,18 @@ import { List } from './ImageGallery.styled';
 
 const ImageGallery = ({ photoArray }) => {
   return (
-    <div className="gallery">
+    <div>
       <List>
-        <ImageGalleryItem photoArray={photoArray} />
+        {photoArray.map(photo => {
+          return (
+            <ImageGalleryItem
+              key={photo.id}
+              webFormat={photo.webformatURL}
+              alt={photo.tags}
+              largeImage={photo.largeImageURL}
+            />
+          );
+        })}
       </List>
     </div>
   );

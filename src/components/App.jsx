@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import SimpleLightbox from 'simplelightbox';
+// import SimpleLightbox from 'simplelightbox';
 import 'simplelightbox/dist/simple-lightbox.min.css';
 import api from './Api/Api';
 import Searchbar from './Searchbar';
@@ -13,17 +13,13 @@ class App extends Component {
     page: 1,
     photoArray: [],
     status: 'idle',
+    totalHits: 0,
   };
 
   componentDidUpdate(prevProps, prevState) {
-    this.simpleLightbox();
+    // this.simpleLightbox();
     const { searchQuery, page } = this.state;
 
-    if (prevState.searchQuery !== searchQuery) {
-      this.setState({
-        photoArray: [],
-      });
-    }
     if (prevState.searchQuery !== searchQuery || prevState.page !== page) {
       this.setState({
         status: 'pending',
@@ -33,6 +29,7 @@ class App extends Component {
         .then(newCards => {
           this.setState(prevState => ({
             photoArray: [...prevState.photoArray, ...newCards.hits],
+            totalHits: newCards.total,
             status: 'resolved',
           }));
         })
@@ -45,15 +42,16 @@ class App extends Component {
     }
   }
 
-  simpleLightbox = () => {
-    var lightbox = new SimpleLightbox('.gallery a', {});
-    lightbox.refresh();
-  };
+  // simpleLightbox = () => {
+  //   var lightbox = new SimpleLightbox('.gallery a', {});
+  //   lightbox.refresh();
+  // };
 
   handleSubmit = inputValue => {
     this.setState({
       searchQuery: inputValue,
       page: 1,
+      photoArray: [],
     });
   };
 
@@ -64,7 +62,8 @@ class App extends Component {
   };
 
   render() {
-    const { status, photoArray } = this.state;
+    const { status, photoArray, totalHits, page } = this.state;
+    const totalPages = Math.ceil(totalHits / 12);
 
     if (status === 'idle') {
       return <Searchbar onSubmit={this.handleSubmit} />;
@@ -84,7 +83,7 @@ class App extends Component {
         <>
           <Searchbar onSubmit={this.handleSubmit} />
           <ImageGallery photoArray={photoArray} />
-          <Button onClick={this.loadMorePhoto} />
+          {page < totalPages && <Button onClick={this.loadMorePhoto} />}
         </>
       );
     }

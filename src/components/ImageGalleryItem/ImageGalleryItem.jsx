@@ -1,20 +1,39 @@
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
+import { Component } from 'react';
+import Modal from 'components/Modal';
 import { Item, Image } from './ImageGalleryItem.styled';
 
-const ImageGalleryItem = ({ photoArray }) => {
-  return photoArray.map(({ id, largeImageURL, webformatURL, tags }) => {
-    return (
-      <Item key={id}>
-        <a href={largeImageURL}>
-          <Image src={webformatURL} alt={tags} />
-        </a>
-      </Item>
-    );
-  });
-};
+class ImageGalleryItem extends Component {
+  state = {
+    showModal: false,
+  };
 
-ImageGalleryItem.propTypes = {
-  photoArray: PropTypes.arrayOf(PropTypes.shape({})),
-};
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({
+      showModal: !showModal,
+    }));
+  };
+
+  render() {
+    const { showModal } = this.state;
+    const { webFormat, alt, largeImage } = this.props;
+    return (
+      <>
+        <Item onClick={this.toggleModal}>
+          <Image src={webFormat} alt={alt} loading="lazy" />
+        </Item>
+        {showModal && (
+          <Modal onClose={this.toggleModal}>
+            <Image src={largeImage} alt={alt} loading="lazy" />
+          </Modal>
+        )}
+      </>
+    );
+  }
+}
+
+// ImageGalleryItem.propTypes = {
+//   photoArray: PropTypes.arrayOf(PropTypes.shape({})),
+// };
 
 export default ImageGalleryItem;
